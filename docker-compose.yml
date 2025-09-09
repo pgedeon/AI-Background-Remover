@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  background-remover-api:
+    build: .
+    gpus: all
+    ports:
+      - "5001:5001"
+    environment:
+      - MAX_UPLOAD_SIZE_MB=10
+      - PROCESSED_DIR=processed
+      - STATIC_DIR=.
+      - HOST=0.0.0.0
+      - PORT=5001
+      - FLASK_DEBUG=0
+      - FP16=auto
+      - PNG_COMPRESS_LEVEL=6
+      - INTERFACE_CACHE_SIZE=4
+      - WARMUP=0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ./processed:/app/processed
+      - .:/app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  background-remover-frontend:
+    image: node:18-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - PORT=3000
+    command: sh -c "npm install && npm start"
+    depends_on:
+      - background-remover-api
+    restart: unless-stopped

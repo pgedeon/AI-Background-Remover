@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Remove backgrounds from your images quickly in the browser.">
+</head>
+<body>
+    <div class="container">
+        <h1>Background Remover</h1>
+        <p>Upload one or more images to remove their backgrounds.</p>
+
+        <div class="upload-container">
+            <input type="file" id="file-input" accept="image/*" multiple>
+            <label for="file-input" class="upload-label">Choose Images</label>
+        </div>
+
+        <div class="hint">Tip: You can also drag & drop images into the grid below.</div>
+
+        <div class="settings-panel">
+            <h3>Background Removal Settings</h3>
+            <div class="settings-grid">
+                <div class="setting">
+                    <label for="preset">Preset:</label>
+                    <select id="preset">
+                        <option value="auto">Auto (GPU optimized)</option>
+                        <option value="portrait">Portrait Hair</option>
+                        <option value="product">Product Crisp</option>
+                        <option value="illustration">Illustration Clean</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="object-type">Object Type:</label>
+                    <select id="object-type">
+                        <option value="hairs-like">Hairs-like (More aggressive)</option>
+                        <option value="object">Object (Less aggressive)</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="trimap-threshold">Trimap Threshold:</label>
+                    <input type="range" id="trimap-threshold" min="200" max="250" value="231" step="1">
+                    <span id="trimap-threshold-value">231</span>
+                </div>
+                <div class="setting">
+                    <label for="trimap-dilation">Trimap Dilation:</label>
+                    <input type="range" id="trimap-dilation" min="10" max="50" value="30" step="1">
+                    <span id="trimap-dilation-value">30</span>
+                </div>
+                <div class="setting">
+                    <label for="trimap-erosion">Trimap Erosion:</label>
+                    <input type="range" id="trimap-erosion" min="1" max="10" value="5" step="1">
+                    <span id="trimap-erosion-value">5</span>
+                </div>
+                <div class="setting">
+                    <label for="feather-radius">Edge Feather (px):</label>
+                    <input type="range" id="feather-radius" min="0" max="8" value="0" step="0.5">
+                    <span id="feather-radius-value">0</span>
+                </div>
+                <div class="setting">
+                    <label for="alpha-threshold">Alpha Threshold:</label>
+                    <input type="range" id="alpha-threshold" min="0" max="255" value="0" step="1">
+                    <span id="alpha-threshold-value">0</span>
+                </div>
+            </div>
+            <div class="runtime-info" id="runtime-info">Detecting backend…</div>
+        </div>
+
+        <div class="gallery" id="gallery" aria-label="Drop images here" tabindex="0"></div>
+
+        <div class="controls">
+            <button id="select-all" type="button" title="Toggle select all thumbnails">Select All</button>
+            <button id="process-images" type="button" title="Send selected images for background removal">Process Images</button>
+            <button id="download-selected" type="button" title="Download all processed images">Download Selected</button>
+        </div>
+
+        <noscript>
+            <p style="color:#cc0000">JavaScript is required to use this app.</p>
+        </noscript>
+    </div>
+
+    <!-- Simple inline sanity check to surface API availability -->
+    <script>
+        (async function(){
+            try {
+                const r = await fetch('/health', { cache: 'no-store' });
+                if (!r.ok) throw new Error('health not ok');
+                console.log('Health check OK');
+            } catch (e) {
+                console.warn('Backend not reachable. Start Flask app.py on port 5001.');
+            }
+        })();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
